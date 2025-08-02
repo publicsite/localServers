@@ -1,0 +1,635 @@
+<html>
+<head>
+<meta http-equiv='cache-control' content='no-cache'>
+<meta http-equiv='expires' content='0'>
+<meta http-equiv='pragma' content='no-cache'>
+</head>
+<title>UK News Aggregator</title>
+</head>
+<center>
+<h2>All News:</h2>
+<body onload="aggregate();">
+<div id="theNews">Loading...</div>
+</body>
+</center>
+</html>
+<script src="https://cdn.jsdelivr.net/gh/abdmob/x2js/xml2json.js"></script>
+<script>
+	
+
+function getTime(dateString)
+{
+var date = new Date(dateString);
+return date.getTime();
+}
+
+function sortByDate(a, b) {
+    if (a[0] > b[0])
+	return 1;
+else return 0;
+}
+
+
+
+/*
+function reqonload() {
+        if (self.xmlHttpReq.status == 200) {
+		updatepage(self.xmlHttpReq.responseText, feed_name, index);
+		tryagain=0;
+        }
+	else if (self.xmlHttpReq.status == 405) {
+		tryagain=405;
+	}
+	else tryagain=0;
+}
+*/
+
+/*
+function xmlhttpPost(strURL, feed_name, index) {
+//var newurl = 'https://api.allorigins.win/json?url=';
+var newurl = 'https://test.cors.workers.dev/?';
+//var newurl = 'https://api.allorigins.win/raw?url=';
+    //var url = newurl + encodeURIComponent(strURL + '&' + 'nocache=' + Date.now());
+var url = newurl + strURL;
+	
+//here we use yahoo yql as a cors proxy
+var newurl = '';
+//"select title,link,pubDate from rss where url='"
+
+    var xmlHttpReq = false;
+    var self = this;
+    if (window.XMLHttpRequest) { // Mozilla/Safari
+        self.xmlHttpReq = new XMLHttpRequest();
+    }
+    else if (window.ActiveXObject) { // IE
+        self.xmlHttpReq = new ActiveXObject("Microsoft.XMLHTTP");
+    }
+
+    self.xmlHttpReq.open('GET', newurl + url, false);
+    self.xmlHttpReq.setRequestHeader('Content-Type', 'application/rss+xml');
+    self.xmlHttpReq.onload = reqonload();
+
+    self.xmlHttpReq.send();
+
+}
+*/
+
+
+async function fetchFunction(aURL) {
+
+	tryagain=1;
+
+	while (tryagain == 1)
+	{
+		const response = await fetch(aURL);
+
+		if (response.status == 200)
+		{
+			const responsetext = await response.text();
+			tryagain=0;
+			return responsetext;
+		}
+		else if (response.status == 405)
+		{
+			tryagain=1;
+		}
+		else
+		{
+			tryagain=0;
+			return "";
+		}
+	}
+}
+
+async function aggregate(){
+	
+var feed_urls = [
+"http://127.0.0.1:8083/cgi-bin/newsProxy0.sh",
+"http://127.0.0.1:8083/cgi-bin/newsProxy1.sh",
+"http://127.0.0.1:8083/cgi-bin/newsProxy2.sh",
+"http://127.0.0.1:8083/cgi-bin/newsProxy3.sh",
+"http://127.0.0.1:8083/cgi-bin/newsProxy4.sh",
+"http://127.0.0.1:8083/cgi-bin/newsProxy5.sh",
+"http://127.0.0.1:8083/cgi-bin/newsProxy6.sh",
+"http://127.0.0.1:8083/cgi-bin/newsProxy7.sh",
+"http://127.0.0.1:8083/cgi-bin/newsProxy8.sh"
+]
+
+var feed_names = [
+"Daily Mail",
+"The Express",
+"The Guardian",
+"BBC [World]",
+"BBC [UK]",
+"Sky",
+"The Independent",
+"The Telegraph",
+"The Evening Standard"
+]
+
+//Removed "The Daily Star","The Scotsman","Twitter","Trinity Mirror","Yahoo"
+//Removed "The Sun" "The Metro" "The Daily Mail" "HuffPost"
+
+	x2js = new X2JS();
+
+	entries = [];
+
+	for (index=0; index < feed_urls.length; ++index)
+	{
+			alert("Getting " + feed_names[index] + "...");
+
+		tryagain=1;
+		while (tryagain == 1)
+		{
+
+			strURL=feed_urls[index];
+			feed_name=feed_names[index];
+			//alert(entries.length)
+
+			//newurl = 'http://www.whateverorigin.org/get?url='
+			url = strURL;
+
+  			copiedstr = await fetchFunction(url);
+			str = copiedstr
+			//str = JSON.parse(copiedstr).contents.toString();
+			
+				myobj = x2js.xml_str2json(str);
+				//alert(myobj.rss.channel.item.length);
+				for (i=0; i < myobj.rss.channel.item.length; i++)
+				{
+
+				theEntry = '<a href="' + myobj.rss.channel.item[i].link + '">' + myobj.rss.channel.item[i].title + '</a>' + '<br>(' + feed_name + ": " + myobj.rss.channel.item[i].pubDate +')' + "<br><br>";
+
+					if (typeof myobj.rss.channel.item[i].title !== 'undefined')
+						thetitle=await myobj.rss.channel.item[i].title.toString();
+					else
+						thetitle=""
+
+					if (typeof myobj.rss.channel.item[i].description !== 'undefined')
+						thedescription=await myobj.rss.channel.item[i].description.toString();
+					else
+						thedescription=""
+
+					var pass=false;
+
+					// check the description
+
+					if (thedescription.match("oil") != null)
+						pass=true;
+					else if (thedescription.match("Oil") != null)
+						pass=true;
+					else if (thedescription.match("oil") != null)
+						pass=true;
+					else if (thedescription.match("Coal") != null)
+						pass=true;
+					else if (thedescription.match("coal") != null)
+						pass=true;
+					else if (thedescription.match("Nuclear") != null)
+						pass=true;
+					else if (thedescription.match("nuclear") != null)
+						pass=true;
+					else if (thedescription.match("Submarine") != null)
+						pass=true;
+					else if (thedescription.match("submarine") != null)
+						pass=true;
+					else if (thedescription.match("Royal Navy Fleet") != null)
+						pass=true;
+					else if (thedescription.match("Royal Navy fleet") != null)
+						pass=true;
+					else if (thedescription.match("Challenger 3") != null)
+						pass=true;
+					else if (thedescription.match("onsumption room") != null)
+						pass=true;
+					else if (thedescription.match("onsumption Room") != null)
+						pass=true;
+					else if (thedescription.match("njection site") != null)
+						pass=true;
+					else if (thedescription.match("njection Site") != null)
+						pass=true;
+					else if (thedescription.match("petrol") != null)
+						pass=true;
+					else if (thedescription.match("Petrol") != null)
+						pass=true;
+					else if (thedescription.match("OPEC") != null)
+						pass=true;
+					else if (thedescription.match("Natural Gas") != null)
+						pass=true;
+					else if (thedescription.match("natural gas") != null)
+						pass=true;
+					else if (thedescription.match("Wheat") != null)
+						pass=true;
+					else if (thedescription.match("wheat") != null)
+						pass=true;
+					else if (thedescription.match("Grain") != null)
+						pass=true;
+					else if (thedescription.match("grain") != null)
+						pass=true;
+					else if (thedescription.match("Inflation") != null)
+						pass=true;
+					else if (thedescription.match("inflation") != null)
+						pass=true;
+					else if (thedescription.match("Supply-Chain") != null)
+						pass=true;
+					else if (thedescription.match("supply-chain") != null)
+						pass=true;
+					else if (thedescription.match("Supply Chain") != null)
+						pass=true;
+					else if (thedescription.match("supply chain") != null)
+						pass=true;
+					else if (thedescription.match("Consumer Confidence") != null)
+						pass=true;
+					else if (thedescription.match("consumer confidence") != null)
+						pass=true;
+					else if (thedescription.match("Demand") != null)
+						pass=true;
+					else if (thedescription.match("demand") != null)
+						pass=true;
+					else if (thedescription.match("Consumer Price Index") != null)
+						pass=true;
+					else if (thedescription.match("consumer price index") != null)
+						pass=true;
+					else if (thedescription.match("CPI") != null)
+						pass=true;
+					else if (thedescription.match("Underground") != null)
+						pass=true;
+					else if (thedescription.match("underground") != null)
+						pass=true;
+					else if (thedescription.match("Tunnel") != null)
+						pass=true;
+					else if (thedescription.match("tunnel") != null)
+						pass=true;
+					else if (thedescription.match("Trench") != null)
+						pass=true;
+					else if (thedescription.match("trench") != null)
+						pass=true;
+					else if (thedescription.match("NHS") != null)
+						pass=true;
+					else if (thedescription.match("Dentist") != null)
+						pass=true;
+					else if (thedescription.match("dentist") != null)
+						pass=true;
+					else if (thedescription.match("Private Healthcare") != null)
+						pass=true;
+					else if (thedescription.match("private healthcare") != null)
+						pass=true;
+					else if (thedescription.match("Shipping") != null)
+						pass=true;
+					else if (thedescription.match("shipping") != null)
+						pass=true;
+					else if (thedescription.match("Dover") != null)
+						pass=true;
+					else if (thedescription.match("Airlines") != null)
+						pass=true;
+					else if (thedescription.match("airlines") != null)
+						pass=true;
+					else if (thedescription.match("Flights") != null)
+						pass=true;
+					else if (thedescription.match("flights") != null)
+						pass=true;
+					else if (thedescription.match("Backlog") != null)
+						pass=true;
+					else if (thedescription.match("backlog") != null)
+						pass=true;
+					else if (thedescription.match("Stagflation") != null)
+						pass=true;
+					else if (thedescription.match("stagflation") != null)
+						pass=true;
+					else if (thedescription.match("Sanctions") != null)
+						pass=true;
+					else if (thedescription.match("sanctions") != null)
+						pass=true;
+					else if (thedescription.match("Seafood") != null)
+						pass=true;
+					else if (thedescription.match("seafood") != null)
+						pass=true;
+					else if (thedescription.match("Environment") != null)
+						pass=true;
+					else if (thedescription.match("environment") != null)
+						pass=true;
+					else if (thedescription.match("Ammunition") != null)
+						pass=true;
+					else if (thedescription.match("ammunition") != null)
+						pass=true;
+					else if (thedescription.match("ighter Jet") != null)
+						pass=true;
+					else if (thedescription.match("ighter jet") != null)
+						pass=true;
+					else if (thedescription.match("ighter Plane") != null)
+						pass=true;
+					else if (thedescription.match("ighter plane") != null)
+						pass=true;
+
+					//check the title
+
+					if (thetitle.match("Oil") != null)
+						pass=true;
+					else if (thetitle.match("oil") != null)
+						pass=true;
+					else if (thetitle.match("Coal") != null)
+						pass=true;
+					else if (thetitle.match("coal") != null)
+						pass=true;
+					else if (thetitle.match("Nuclear") != null)
+						pass=true;
+					else if (thetitle.match("nuclear") != null)
+						pass=true;
+					else if (thetitle.match("Submarine") != null)
+						pass=true;
+					else if (thetitle.match("submarine") != null)
+						pass=true;
+					else if (thetitle.match("Royal Navy Fleet") != null)
+						pass=true;
+					else if (thetitle.match("Royal Navy fleet") != null)
+						pass=true;
+					else if (thetitle.match("Challenger 3") != null)
+						pass=true;
+					else if (thetitle.match("onsumption room") != null)
+						pass=true;
+					else if (thetitle.match("onsumption Room") != null)
+						pass=true;
+					else if (thetitle.match("njection site") != null)
+						pass=true;
+					else if (thetitle.match("njection Site") != null)
+						pass=true;
+					else if (thetitle.match("petrol") != null)
+						pass=true;
+					else if (thetitle.match("Petrol") != null)
+						pass=true;
+					else if (thetitle.match("OPEC") != null)
+						pass=true;
+					else if (thetitle.match("Natural Gas") != null)
+						pass=true;
+					else if (thetitle.match("natural gas") != null)
+						pass=true;
+					else if (thetitle.match("Wheat") != null)
+						pass=true;
+					else if (thetitle.match("wheat") != null)
+						pass=true;
+					else if (thetitle.match("Grain") != null)
+						pass=true;
+					else if (thetitle.match("grain") != null)
+						pass=true;
+					else if (thetitle.match("Inflation") != null)
+						pass=true;
+					else if (thetitle.match("inflation") != null)
+						pass=true;
+					else if (thetitle.match("Supply-Chain") != null)
+						pass=true;
+					else if (thetitle.match("supply-chain") != null)
+						pass=true;
+					else if (thetitle.match("Supply Chain") != null)
+						pass=true;
+					else if (thetitle.match("supply chain") != null)
+						pass=true;
+					else if (thetitle.match("Consumer Confidence") != null)
+						pass=true;
+					else if (thetitle.match("consumer confidence") != null)
+						pass=true;
+					else if (thetitle.match("Demand") != null)
+						pass=true;
+					else if (thetitle.match("demand") != null)
+						pass=true;
+					else if (thetitle.match("Consumer Price Index") != null)
+						pass=true;
+					else if (thetitle.match("consumer price index") != null)
+						pass=true;
+					else if (thetitle.match("CPI") != null)
+						pass=true;
+					else if (thetitle.match("Underground") != null)
+						pass=true;
+					else if (thetitle.match("underground") != null)
+						pass=true;
+					else if (thetitle.match("Tunnel") != null)
+						pass=true;
+					else if (thetitle.match("tunnel") != null)
+						pass=true;
+					else if (thetitle.match("Trench") != null)
+						pass=true;
+					else if (thetitle.match("trench") != null)
+						pass=true;
+					else if (thetitle.match("NHS") != null)
+						pass=true;
+					else if (thetitle.match("Dentist") != null)
+						pass=true;
+					else if (thetitle.match("dentist") != null)
+						pass=true;
+					else if (thetitle.match("Private Healthcare") != null)
+						pass=true;
+					else if (thetitle.match("private healthcare") != null)
+						pass=true;
+					else if (thetitle.match("Shipping") != null)
+						pass=true;
+					else if (thetitle.match("shipping") != null)
+						pass=true;
+					else if (thetitle.match("Dover") != null)
+						pass=true;
+					else if (thetitle.match("Airlines") != null)
+						pass=true;
+					else if (thetitle.match("airlines") != null)
+						pass=true;
+					else if (thetitle.match("Flights") != null)
+						pass=true;
+					else if (thetitle.match("flights") != null)
+						pass=true;
+					else if (thetitle.match("Backlog") != null)
+						pass=true;
+					else if (thetitle.match("backlog") != null)
+						pass=true;
+					else if (thetitle.match("Stagflation") != null)
+						pass=true;
+					else if (thetitle.match("stagflation") != null)
+						pass=true;
+					else if (thetitle.match("Sanctions") != null)
+						pass=true;
+					else if (thetitle.match("sanctions") != null)
+						pass=true;
+					else if (thetitle.match("Seafood") != null)
+						pass=true;
+					else if (thetitle.match("seafood") != null)
+						pass=true;
+					else if (thetitle.match("Environment") != null)
+						pass=true;
+					else if (thetitle.match("environment") != null)
+						pass=true;
+					else if (thetitle.match("Ammunition") != null)
+						pass=true;
+					else if (thetitle.match("ammunition") != null)
+						pass=true;
+					else if (thetitle.match("ighter Jet") != null)
+						pass=true;
+					else if (thetitle.match("ighter jet") != null)
+						pass=true;
+					else if (thetitle.match("ighter Plane") != null)
+						pass=true;
+					else if (thetitle.match("ighter plane") != null)
+						pass=true;
+
+					//eliminate rage bait -check the description
+					if (thedescription.match("Trans") != null)
+						pass=false;
+					else if (thedescription.match("trans") != null)
+						pass=false;
+					else if (thedescription.match("gender") != null)
+						pass=false;
+					else if (thedescription.match("Gender") != null)
+						pass=false;
+					else if (thedescription.match("single-sex") != null)
+						pass=false;
+					else if (thedescription.match("Muslim") != null)
+						pass=false;
+					else if (thedescription.match("Islamist") != null)
+						pass=false;
+					else if (thedescription.match("islamist") != null)
+						pass=false;
+					else if (thedescription.match("Stabbed") != null)
+						pass=false;
+					else if (thedescription.match("stabbed") != null)
+						pass=false;
+					else if (thedescription.match("Punched") != null)
+						pass=false;
+					else if (thedescription.match("punched") != null)
+						pass=false;
+					else if (thedescription.match("Kicked") != null)
+						pass=false;
+					else if (thedescription.match("kicked") != null)
+						pass=false;
+					else if (thedescription.match("Islamic") != null)
+						pass=false;
+					else if (thedescription.match("semitism") != null)
+						pass=false;
+					else if (thedescription.match("semitic") != null)
+						pass=false;
+					else if (thedescription.match("Farage") != null)
+						pass=false;
+					else if (thedescription.match("attack") != null)
+						pass=false;
+					else if (thedescription.match("Attack") != null)
+						pass=false;
+					else if (thedescription.match("definition of a woman") != null)
+						pass=false;
+					else if (thedescription.match("sex") != null)
+						pass=false;
+					else if (thedescription.match("Sex") != null)
+						pass=false;
+					else if (thedescription.match("mall boat") != null)
+						pass=false;
+					else if (thedescription.match("mall Boat") != null)
+						pass=false;
+					else if (thedescription.match("hit-and-run") != null)
+						pass=false;
+					else if (thedescription.match("hit and run") != null)
+						pass=false;
+					else if (thedescription.match("Hit and Run") != null)
+						pass=false;
+					else if (thedescription.match("car crash") != null)
+						pass=false;
+					else if (thedescription.match("car Crash") != null)
+						pass=false;
+					else if (thedescription.match("rooming") != null)
+						pass=false;
+					else if (thedescription.match("roomed") != null)
+						pass=false;
+					else if (thedescription.match("Migrant") != null)
+						pass=false;
+					else if (thedescription.match("migrant") != null)
+						pass=false;
+					else if (thedescription.match("Jew") != null)
+						pass=false;
+
+					//eliminate rage bait - check the title
+					if (thetitle.match("Trans") != null)
+						pass=false;
+					else if (thetitle.match("trans") != null)
+						pass=false;
+					else if (thetitle.match("gender") != null)
+						pass=false;
+					else if (thetitle.match("Gender") != null)
+						pass=false;
+					else if (thetitle.match("single-sex") != null)
+						pass=false;
+					else if (thetitle.match("Muslim") != null)
+						pass=false;
+					else if (thetitle.match("Islamist") != null)
+						pass=false;
+					else if (thetitle.match("islamist") != null)
+						pass=false;
+					else if (thetitle.match("Stabbed") != null)
+						pass=false;
+					else if (thetitle.match("stabbed") != null)
+						pass=false;
+					else if (thetitle.match("Punched") != null)
+						pass=false;
+					else if (thetitle.match("punched") != null)
+						pass=false;
+					else if (thetitle.match("Kicked") != null)
+						pass=false;
+					else if (thetitle.match("kicked") != null)
+						pass=false;
+					else if (thetitle.match("Islamic") != null)
+						pass=false;
+					else if (thetitle.match("semitism") != null)
+						pass=false;
+					else if (thetitle.match("semitic") != null)
+						pass=false;
+					else if (thetitle.match("Farage") != null)
+						pass=false;
+					else if (thetitle.match("attack") != null)
+						pass=false;
+					else if (thetitle.match("Attack") != null)
+						pass=false;
+					else if (thetitle.match("definition of a woman") != null)
+						pass=false;
+					else if (thetitle.match("sex") != null)
+						pass=false;
+					else if (thetitle.match("Sex") != null)
+						pass=false;
+					else if (thetitle.match("mall boat") != null)
+						pass=false;
+					else if (thetitle.match("mall Boat") != null)
+						pass=false;
+					else if (thetitle.match("hit-and-run") != null)
+						pass=false;
+					else if (thetitle.match("hit and run") != null)
+						pass=false;
+					else if (thetitle.match("Hit and Run") != null)
+						pass=false;
+					else if (thetitle.match("car crash") != null)
+						pass=false;
+					else if (thetitle.match("Car Crash") != null)
+						pass=false;
+					else if (thetitle.match("rooming") != null)
+						pass=false;
+					else if (thetitle.match("roomed") != null)
+						pass=false;
+					else if (thetitle.match("Migrant") != null)
+						pass=false;
+					else if (thetitle.match("igrant") != null)
+						pass=false;
+					else if (thetitle.match("Jew") != null)
+						pass=false;
+
+					if (pass == true)
+						entries.push([getTime(myobj.rss.channel.item[i].pubDate), theEntry]);
+
+				}
+
+		}
+
+	}
+	
+	alert("Done getting feeds. Now Processing");
+
+entries.sort(function(a, b) {
+    return ((b[0] < a[0]) ? -1 : ((b[0] == a[0]) ? 0 : 1));
+});
+
+newsout = "";
+	for (index2=0; index2 < entries.length; ++ index2)
+	{
+		newsout = newsout + entries[index2][1];
+	}
+document.getElementById("theNews").innerHTML = "<center>" + newsout + "</center>";
+
+}
+
+</script>
