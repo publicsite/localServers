@@ -13,6 +13,8 @@ cd ..
 
 cd sources
 
+thepwd="$PWD"
+
 #use our python virtual environment
 . "${PWD}/venv/bin/activate"
 
@@ -24,7 +26,7 @@ cd sources
 
 ####RUN IMGIN####
 
-cd imgin
+cd "${thepwd}/imgin"
 #runs on 127.0.0.1:8081
 ./run.py &
 sleep 5
@@ -32,7 +34,7 @@ cd ..
 
 ####RUN YT-LOCAL####
 
-cd yt-local
+cd "${thepwd}/yt-local"
 #runs on 127.0.0.1:9010
 python3 server.py &
 sleep 5
@@ -40,18 +42,14 @@ cd ..
 
 ####RUN QUETRE####
 
-#I couldn't get this one to build (see buildlog)
-
-#cd quetre
-#npm start
-## optional
-#redis-server # useful for caching api responses
+cd "${thepwd}/quetre"
+PORT=8086 npm start &
 
 ####RUN NEUTERS#####
 
-#cd neuters-build
-#./neuters --address "0.0.0.0:13369"
-#cd ..
+cd "${thepwd}/neuters-build/target/debug"
+./neuters --address "127.0.0.1:8085" &
+cd ../../../
 
 ####RUN SIMPLYTRANSLATE-WEB ####
 
@@ -64,8 +62,22 @@ cd ..
 
 ####RUN REDLIB ####
 
-cd redlib-build/target/debug
-./redlib --address 127.0.0.1 --port 8084 &
+cd "${thepwd}/redlib-build/target/debug"
+
+#use a proxy to connect to redlib
+rand_num="$(expr $(od -A n -t d -N 1 /dev/urandom | tr -d ' ') % 3)"
+case $rand_num in
+0)
+HTTP_PROXY="http://190.242.157.215:8080" HTTPS_PROXY="http://190.242.157.215:8080" REDLIB_ENABLE_RSS=on ./redlib --address 127.0.0.1 --port 8084 &
+;;
+1)
+HTTP_PROXY="http://23.237.210.82:80" HTTPS_PROXY="http://23.237.210.82:80" REDLIB_ENABLE_RSS=on ./redlib --address 127.0.0.1 --port 8084 &
+;;
+2)
+HTTP_PROXY="http://159.69.57.20:8880" HTTPS_PROXY="http://159.69.57.20:8880" REDLIB_ENABLE_RSS=on ./redlib --address 127.0.0.1 --port 8084 &
+;;
+esac
+
 sleep 5
 cd ../../../
 

@@ -1,0 +1,26 @@
+#!/bin/sh
+
+URL="${HTTP_HOST}${REQUEST_URI}"
+
+#hack
+URL="$(printf "%s" "$URL" | sed "s#youtubeProxySH/https:/#youtubeProxySH/https://#g")"
+URL="$(printf "%s" "$URL" | sed "s#youtubeProxySH/http:/#youtubeProxySH/http://#g")"
+
+#if [ "$(echo "$URL" | grep "^${HTTP_HOST}/cgi-bin/youtubeProxySH/https://www.youtube.com")" = "" ] && [ "$(echo "$URL" | grep "^${HTTP_HOST}/cgi-bin/youtubeProxySH/127.0.0.1:8082")" = "" ]; then
+#	exit
+#fi
+
+URL="$(printf "%s" "$REQUEST_URI" | sed "s#/cgi-bin/youtubeProxySH/##g")"
+
+#hack
+URL="$(printf "%s" "$URL" | sed "s#https:/www.#https://www.#g")"
+URL="$(printf "%s" "$URL" | sed "s#http:/www.#http://www.#g")"
+
+echo -e 'HTTP/1.1 200\r\nContent-Type: text/html\r\n\r\n'
+echo "<html>"
+echo "<h1>http://127.0.0.1:8082/$URL</h1>"
+echo "</html>"
+
+curl -i -s "http://127.0.0.1:8082/$URL" # | sed "s#127.0.0.1:8082#127.0.0.1:8083/cgi-bin/youtubeProxySH/127.0.0.1:8082#g"
+
+exit 0

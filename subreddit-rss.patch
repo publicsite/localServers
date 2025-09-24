@@ -1,0 +1,47 @@
+--- src/subreddit.rs.old	2025-09-10 04:25:42.922896089 +0100
++++ src/subreddit.rs	2025-09-10 04:29:11.338890108 +0100
+@@ -16,6 +16,8 @@
+ use regex::Regex;
+ use time::{Duration, OffsetDateTime};
+ 
++use std::collections::HashMap;
++
+ // STRUCTS
+ #[derive(Template)]
+ #[template(path = "subreddit.html")]
+@@ -579,13 +581,26 @@
+ 		return Ok(error(req, "RSS is disabled on this instance.").await.unwrap_or_default());
+ 	}
+ 
++	// Get parameters as a hashmap
++	let params: HashMap<String, String> = req
++		.uri()
++		.query()
++		.map(|v| {
++			url::form_urlencoded::parse(v.as_bytes())
++			.into_owned()
++			.collect()
++		})
++		.unwrap_or_else(HashMap::new);
++
+ 	use hyper::header::CONTENT_TYPE;
+ 	use rss::{ChannelBuilder, Item};
+ 
+ 	// Get subreddit
+ 	let sub = req.param("sub").unwrap_or_default();
++
+ 	let post_sort = req.cookie("post_sort").map_or_else(|| "hot".to_string(), |c| c.value().to_string());
+-	let sort = req.param("sort").unwrap_or_else(|| req.param("id").unwrap_or(post_sort));
++
++	let sort = params.get("sort").unwrap_or_else(|| params.get("id").unwrap_or(&post_sort));
+ 
+ 	// Get path
+ 	let path = format!("/r/{sub}/{sort}.json?{}", req.uri().query().unwrap_or_default());
+@@ -595,7 +610,6 @@
+ 
+ 	// Get posts
+ 	let (posts, _) = Post::fetch(&path, false).await?;
+-
+ 	// Build the RSS feed
+ 	let channel = ChannelBuilder::default()
+ 		.title(&subreddit.title)

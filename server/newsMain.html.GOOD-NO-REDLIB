@@ -247,7 +247,7 @@ window.frames[0].document.body.innerHTML = theHTML;
 
 function redditRSSGet(strURL, tld) {
 
-redditprox="127.0.0.1:8084/r/";
+redditprox="old.reddit.com/r/";
 var newurl = '';
     var xmlHttpReq = false;
     var self = this;
@@ -262,9 +262,14 @@ var newurl = '';
         if (self.xmlHttpReq.status == 200) {
     var xmlDoc = self.xmlHttpReq.responseXML;
 theHTML="<html><div style=\"background-color:black;\"><head><base target=\"_blank\"></head><center>"
-for(var index = 0; index < xmlDoc.getElementsByTagName("item").length; index++)
+
+for(var index = 0; index < xmlDoc.getElementsByTagName("entry").length; index++)
 {
-var articleLink = xmlDoc.getElementsByTagName("item")[index].querySelector("link").innerHTML;
+var parser = new DOMParser;
+var dom = parser.parseFromString(
+    '<!doctype html><body>' + xmlDoc.getElementsByTagName("entry")[index].querySelector("content").innerHTML,
+    'text/html');
+var articleLink = dom.body.textContent.split("<span>")[1].match(new RegExp("href=\"" + "(.*)" + "\">"))[1];
 articleLink=articleLink.replace('https://youtu.be/','http://127.0.0.1:8082/https://youtu.be/');
 articleLink=articleLink.replace('https://www.youtu.be/','http://127.0.0.1:8082/https://www.youtu.be/');
 articleLink=articleLink.replace('https://youtube.com/','http://127.0.0.1:8082/https://youtube.com/');
@@ -302,7 +307,7 @@ if (articleLink.includes("https://archive.ph"))
 {
 articleLink=articleLink.split("?")[0];
 }
-			var thetitle=xmlDoc.getElementsByTagName("item")[index].getElementsByTagName("title")[0].childNodes[0].nodeValue;
+			var thetitle=xmlDoc.getElementsByTagName("entry")[index].getElementsByTagName("title")[0].childNodes[0].nodeValue;
 			var pass=true;
 
 			if ( eliminateRageBait(thetitle) == false )
@@ -312,10 +317,16 @@ articleLink=articleLink.split("?")[0];
 	if (pass == true)
 	{
 
-		theHTML = theHTML + "<a href=\"" + articleLink + "\" style=\"color:green\" \">" + xmlDoc.getElementsByTagName("item")[index].getElementsByTagName("title")[0].childNodes[0].nodeValue + "</a>";
-
-		commentLink="http://127.0.0.1:8084" + xmlDoc.getElementsByTagName("item")[index].querySelector("description").innerHTML.match(new RegExp("href=\'" + "(.*)" + "\'>"))[1]
-		commentLink=commentLink.replace('https://www.reddit.com/r/','http://' + redditprox).replace('http://www.reddit.com/r/','http://' + redditprox).replace('www.reddit.com/r/',redditprox).replace('reddit.com/r/',redditprox);
+		theHTML = theHTML + "<a href=\"" + articleLink + "\" style=\"color:green\" \">" + xmlDoc.getElementsByTagName("entry")[index].getElementsByTagName("title")[0].childNodes[0].nodeValue + "</a>";
+//alert(xmlDoc.getElementsByTagName("entry")[index].querySelector("content").innerHTML);
+		commentLink=xmlDoc.getElementsByTagName("entry")[index].querySelector("content").innerHTML.split("href=")[3].split("\"")[1];
+//alert(commentLink);
+		commentLink=commentLink.replace('reddit.com/r/',redditprox).replace('https://www.reddit.com/r/','http://' + redditprox).replace('http://www.reddit.com/r/','http://' + redditprox).replace('www.reddit.com/r/',redditprox);
+		commentLink=commentLink.replace('https://www.reddit.com/r/','http://' + redditprox);
+		commentLink=commentLink.replace('http://www.reddit.com/r/','http://' + redditprox);
+		commentLink=commentLink.replace('https://reddit.com/r/','http://' + redditprox);
+		commentLink=commentLink.replace('http://reddit.com/r/','http://' + redditprox);
+		
 		theHTML = theHTML + "<br><a href=\"" + commentLink + "\" style=\"color:green\"\">Comments</a>" + "<br><br>";
 	}
 }
@@ -344,10 +355,10 @@ var newurl = '';
         if (self.xmlHttpReq.status == 200) {
     var xmlDoc = self.xmlHttpReq.responseXML;
 theHTML="<html><head><base target=\"_blank\"></head><center>"
-for(var index = 0; index < xmlDoc.getElementsByTagName("item").length; index++)
+for(var index = 0; index < xmlDoc.getElementsByTagName("entry").length; index++)
 {
-var thelink = xmlDoc.getElementsByTagName("item")[index].querySelector("link").innerHTML.replace("<![CDATA[", "").replace("]]>", "");
-var thetitle = xmlDoc.getElementsByTagName("item")[index].querySelector("title").innerHTML.replace("<![CDATA[", "").replace("]]>", "");
+var thelink = xmlDoc.getElementsByTagName("entry")[index].querySelector("link").innerHTML.replace("<![CDATA[", "").replace("]]>", "");
+var thetitle = xmlDoc.getElementsByTagName("entry")[index].querySelector("title").innerHTML.replace("<![CDATA[", "").replace("]]>", "");
 theHTML = theHTML + "<a href=\"http://webcache.googleusercontent.com/search?q=cache:" + thelink + "&strip=1&vwsrc=0" + "\">" + thetitle + "</a>" + "<br><br>";
 }
 theHTML = theHTML + "</center></html>"
@@ -828,7 +839,7 @@ const subreddit = "ukpolitics";
 
 const hotornew = urlParams.get('t');
 
-redditRSSGet("http://127.0.0.1:8083/cgi-bin/reddit-ukpolitics-hot-proxy.sh", "http://127.0.0.1:8083/cgi-bin/reddit-ukpolitics-hot-proxy.sh");
+redditRSSGet("http://127.0.0.1:8083/cgi-bin/reddit-ukpolitics-hot-proxy2.sh", "http://127.0.0.1:8083/cgi-bin/reddit-ukpolitics-hot-proxy2.sh");
 
 }
 
@@ -842,7 +853,7 @@ const subreddit = "ukpolitics";
 
 const hotornew = urlParams.get('t');
 
-redditRSSGet("http://127.0.0.1:8083/cgi-bin/reddit-ukpolitics-new-proxy.sh", "http://127.0.0.1:8083/cgi-bin/reddit-ukpolitics-new-proxy.sh");
+redditRSSGet("http://127.0.0.1:8083/cgi-bin/reddit-ukpolitics-new-proxy2.sh", "http://127.0.0.1:8083/cgi-bin/reddit-ukpolitics-new-proxy2.sh");
 
 }
 

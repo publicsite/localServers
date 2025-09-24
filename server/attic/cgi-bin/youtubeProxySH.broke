@@ -1,0 +1,94 @@
+#!/bin/sh
+
+URL="${HTTP_HOST}${REQUEST_URI}"
+
+if [ "$URL" = "" ]; then
+	URL="https://youtube.com"
+elif [ "$URL" = "http://127.0.0.1:8083/cgi-bin/youtubeProxySH" ]; then
+	URL="https://youtube.com"
+elif [ "$URL" = "127.0.0.1:8083/cgi-bin/youtubeProxySH" ]; then
+	URL="https://youtube.com"
+else
+	#hack
+	URL="$(printf "%s" "$URL" | sed "s#youtubeProxySH/https:/#youtubeProxySH/https://#g")"
+	URL="$(printf "%s" "$URL" | sed "s#youtubeProxySH/http:/#youtubeProxySH/http://#g")"
+
+	URL="$(printf "%s" "$URL" | sed "s#http://127.0.0.1:8083/cgi-bin/youtubeProxySH/##g" | sed "s#127.0.0.1:8083/cgi-bin/youtubeProxySH/##g")"
+fi
+
+if [ "$(echo "$URL" | grep "^https://youtu.be.*")" = "" ] && \
+[ "$(echo "$URL" | grep "^https://youtube.com.*")" = "" ] && \
+[ "$(echo "$URL" | grep "^https://www.gstatic.com/youtube.*")" = "" ] && \
+[ "$(echo "$URL" | grep "^https://fonts.gstatic.com/.*")" = "" ] && \
+[ "$(echo "$URL" | grep "^https://accounts.google.com.*")" = "" ] && \
+[ "$(echo "$URL" | grep "^https://.*googlevideo.com/.*")" = "" ] && \
+[ "$(echo "$URL" | grep "^https://i.ytimg.com/.*")" = "" ] && \
+[ "$(echo "$URL" | grep "^https://www.google.com/.*")" = "" ] && \
+[ "$(echo "$URL" | grep "^https://consent.youtube.com/.*")" = "" ] && \
+[ "$(echo "$URL" | grep "^https://fonts.googleapis.com")" = "" ]; then
+echo "<h1>$URL</h1>"
+	exit
+fi
+
+#if [ "$extension" = "js" ]; then
+#	echo "Content-type: text/javascript"
+#	echo
+#elif [ "$extension" = "css" ]; then
+#	echo "Content-type: text/css"
+#	echo
+#elif [ "$extension" = "jpg" ]; then
+#	sleep 1
+#else
+#	echo "Content-type: text/html"
+#	echo
+#fi
+
+content_type="$(curl -s -e robots=off -L "$URL" -I | grep "content-type" | tail -n 1)"
+
+echo -e 'HTTP/1.1 200\r\n$(printf "%s" "$content_type")\r\n\r\n'
+
+output="$(curl -s -e robots=off -L "$URL")"
+
+printf "%s\n" "$output" \
+| sed "s#fonts.googleapis.com#https://fonts.googleapis.com#g" \
+| sed "s#href=\"https://youtube.com/channel#href=\"http://127.0.0.1:8082/https://youtube.com/channel#g" \
+| sed "s#action=\"https://youtube.com/channel#action=\"http://127.0.0.1:8082/https://youtube.com/channel#g" \
+| sed "s#src=\"https://youtube.com/channel#src=\"http://127.0.0.1:8082/https://youtube.com/channel#g" \
+| sed "s#href=\"https://youtube.com/playlist#href=\"http://127.0.0.1:8082/https://youtube.com/playlist#g" \
+| sed "s#action=\"https://youtube.com/playlist#action=\"http://127.0.0.1:8082/https://youtube.com/playlist#g" \
+| sed "s#src=\"https://youtube.com/playlist#src=\"http://127.0.0.1:8082/https://youtube.com/playlist#g" \
+| sed "s#href=\"https://youtube.com#href=\"http://127.0.0.1:8083/cgi-bin/youtubeProxySH/https://youtube.com#g" \
+| sed "s#action=\"https://youtube.com#action=\"http://127.0.0.1:8083/cgi-bin/youtubeProxySH/https://youtube.com#g" \
+| sed "s#src=\"https://youtube.com#src=\"http://127.0.0.1:8083/cgi-bin/youtubeProxySH/https://youtube.com#g" \
+| sed "s#href=\"https://youtu.be/channel#href=\"http://127.0.0.1:8082/https://youtu.be/channel#g" \
+| sed "s#action=\"https://youtu.be/channel#action=\"http://127.0.0.1:8083/https://youtu.be/channel#g" \
+| sed "s#src=\"https://youtu.be/channel#script src=\"http://127.0.0.1:8083/https://youtu.be/channel#g" \
+| sed "s#href=\"https://youtu.be/playlist#href=\"http://127.0.0.1:8082/https://youtu.be/playlist#g" \
+| sed "s#action=\"https://youtu.be/playlist#action=\"http://127.0.0.1:8083/https://youtu.be/playlist#g" \
+| sed "s#src=\"https://youtu.be/playlist#script src=\"http://127.0.0.1:8083/https://youtu.be/playlist#g" \
+| sed "s#href=\"https://youtu.be#href=\"http://127.0.0.1:8083/cgi-bin/youtubeProxySH/https://youtu.be/#g" \
+| sed "s#action=\"https://youtu.be#action=\"http://127.0.0.1:8083/cgi-bin/youtubeProxySH/https://youtube.com#g" \
+| sed "s#src=\"https://youtu.be#script src=\"http://127.0.0.1:8083/cgi-bin/youtubeProxySH/https://youtu.be/#g" \
+| sed "s#src=\"/#src=\"https://youtube.com/#g" \
+| sed "s#action=\"/#action=\"https://youtube.com/#g" \
+| sed "s#src='//#src='http://127.0.0.1:8083/cgi-bin/youtubeProxySH/#g" \
+| sed "s#script src=\"//#script src=\"http://127.0.0.1:8083/cgi-bin/youtubeProxySH/#g" \
+| sed "s#href=\"//#href=\"http://127.0.0.1:8083/cgi-bin/youtubeProxySH/#g" \
+| sed "s#href='//#href='http://127.0.0.1:8083/cgi-bin/youtubeProxySH/#g" \
+| sed "s#href=\"/#href=\"http://127.0.0.1:8083/cgi-bin/youtubeProxySH/https://youtube.com/#g" \
+| sed "s#:\"/s/player/#:\"https://youtube.com/s/player/#g" \
+| sed "s#/youtubei/v1/#:\"https://youtube.com/youtubei/v1/#g" \
+| sed "s#https://.*googlevideo.com/#http://127.0.0.1:8083/cgi-bin/youtubeProxySH/https://.*googlevideo.com/#g" \
+| sed "s#/s/search/audio#youtube.com/s/search/audio#g" \
+| sed "s#https://www.gstatic.com/youtube#http://127.0.0.1:8083/cgi-bin/youtubeProxySH/https://www.gstatic.com/youtube#g" \
+| sed "s#https://fonts.gstatic.com#http://127.0.0.1:8083/cgi-bin/youtubeProxySH/https://fonts.gstatic.com#g" \
+| sed "s#https://accounts.google.com#http://127.0.0.1:8083/cgi-bin/youtubeProxySH/https://accounts.google.com#g" \
+| sed "s#https://www.youtube.com/s#http://127.0.0.1:8083/cgi-bin/youtubeProxySH/https://youtube.com/s#g" \
+| sed "s#https://consent.youtube.com/#http://127.0.0.1:8083/cgi-bin/youtubeProxySH/https://consent.youtube.com/#g" \
+| sed "s#https://i.ytimg.com/#http://127.0.0.1:8083/cgi-bin/youtubeProxySH/https://i.ytimg.com/#g" \
+| sed "s#https://www.google.com/js#http://127.0.0.1:8083/cgi-bin/youtubeProxySH/https://www.google.com/js#g"
+
+
+
+
+exit 0

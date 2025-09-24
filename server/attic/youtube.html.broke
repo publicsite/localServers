@@ -1,0 +1,53 @@
+<HTML>
+<HEAD>
+<script type="text/javascript">
+
+function xmlHTMLGet(strURL) {
+alert(strURL);
+var newurl = '';
+    var xmlHttpReq = false;
+    var self = this;
+    if (window.XMLHttpRequest) { // Mozilla/Safari
+        self.xmlHttpReq = new XMLHttpRequest();
+    }
+    else if (window.ActiveXObject) { // IE
+        self.xmlHttpReq = new ActiveXObject("Microsoft.XMLHTTP");
+    }
+    self.xmlHttpReq.open('GET', newurl + strURL, false);
+    self.xmlHttpReq.onload = function() {
+        if (self.xmlHttpReq.status == 200) {
+    var xmlDoc = self.xmlHttpReq.responseXML;
+theHTML="<html><head><base target=\"_blank\"></head><center>" + xmlDoc + "</center></html>"
+window.frames[0].document.body.innerHTML = theHTML;
+
+            //document.getElementById("theFrame").document.body.innerHTML = theText2;
+        }
+    }
+
+    self.xmlHttpReq.send();
+}
+
+function searchFunction(){
+theurl="http://127.0.0.1:8082/youtube.com/results?search_query=" + document.getElementById("thetextbox").value();
+xmlHTMLGet(theurl);
+}
+
+</script>
+</HEAD>
+<BODY>
+Search:
+<form onsubmit="searchFunction()">
+<input type="text" id="thetextbox">
+</form>
+
+<input type="radio" name="theYTRads" onclick="xmlHTMLGet('http://127.0.0.1:8082/https://www.youtube.com/channel/UC-9-kyTW8ZkZNDHQJ6FgpwQ')">Music</input>
+<input type="radio" name="theYTRads" onclick="xmlHTMLGet('http://127.0.0.1:8082/https://www.youtube.com/channel/UC4R8DWoMoI7CAwX8_LjQHig')">Live</input>
+<input type="radio" name="theYTRads" onclick="xmlHTMLGet('http://127.0.0.1:8082/https://www.youtube.com/channel/UCYfdidRxbB8Qhf0Nx7ioOYw')">News</input>
+<input type="radio" name="theYTRads" onclick="xmlHTMLGet('http://127.0.0.1:8082/https://www.youtube.com/channel/UCEgdi0XIXXZ-qJOFPf4JSKw')">Sports</input>
+<input type="radio" name="theYTRads" onclick="xmlHTMLGet('http://127.0.0.1:8082/https://www.youtube.com/channel/UCtFRv9O2AHqOZjjynzrv-xg')">Learning</input>
+<input type="radio" name="theYTRads" onclick="xmlHTMLGet('http://127.0.0.1:8082/https://www.youtube.com/channel/UCtFRv9O2AHqOZjjynzrv-xg')">Fashion and Beauty</input>
+<br>
+<iframe id="ytframe"></iframe>
+
+</BODY>
+</HTML>

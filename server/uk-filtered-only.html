@@ -97,9 +97,7 @@ window.frames[0].document.getElementsByTagName('head')[0].appendChild(thebase);
 }
 
 function xmlRSSGet(strURL, tld) {
-
-var redditprox="127.0.0.1:8084/r/"
-
+redditprox="127.0.0.1:8084/r/";
 var newurl = '';
     var xmlHttpReq = false;
     var self = this;
@@ -120,41 +118,44 @@ var parser = new DOMParser;
 var dom = parser.parseFromString(
     '<!doctype html><body>' + xmlDoc.getElementsByTagName("entry")[index].querySelector("content").innerHTML,
     'text/html');
-var articleLink = dom.body.textContent.split("<span>")[1].match(new RegExp("href=\"" + "(.*)" + "\">"))[1];
-
+var articleLink = xmlDoc.getElementsByTagName("item")[index].querySelector("link").innerHTML;
+articleLink=articleLink.replace('https://youtu.be/','http://127.0.0.1:8082/https://youtu.be/');
+articleLink=articleLink.replace('https://www.youtu.be/','http://127.0.0.1:8082/https://www.youtu.be/');
+articleLink=articleLink.replace('https://youtube.com/','http://127.0.0.1:8082/https://youtube.com/');
+articleLink=articleLink.replace('https://www.youtube.com/','http://127.0.0.1:8082/https://www.youtube.com/');
+articleLink=articleLink.replace('https://www.reddit.com/r/','http://' + redditprox);
+articleLink=articleLink.replace('http://www.reddit.com/r/','http://' + redditprox);
+articleLink=articleLink.replace('https://reddit.com/r/','http://' + redditprox);
+articleLink=articleLink.replace('http://reddit.com/r/','http://' + redditprox);
 articleLink=articleLink.replace('www.reddit.com/r/',redditprox);
-articleLink=articleLink.replace('www.' + redditprox,redditprox);
-
-if (redditprox == "127.0.0.1:8084/r/" && articleLink.includes(redditprox) )
-{
-	articleLink=articleLink.replace('https:','http:');
-}
-
+articleLink=articleLink.replace('reddit.com/r/',redditprox);
 //awoo
-if (articleLink.includes('https://www.thetimes.com') || articleLink.includes('http://www.thetimes.com') || articleLink.includes('https://thetimes.com') || articleLink.includes('http://thetimes.com'))
-{
-//strip params from url
-articleLink=articleLink.split("?")[0];
-}
 articleLink=articleLink.replace('https://www.thetimes.com','https://archive.ph/https://www.thetimes.com');
 articleLink=articleLink.replace('http://www.thetimes.com','https://archive.ph/http://www.thetimes.com');
 articleLink=articleLink.replace('https://thetimes.com','https://archive.ph/https://thetimes.com');
 articleLink=articleLink.replace('http://thetimes.com','https://archive.ph/http://thetimes.com');
-articleLink=articleLink.replace('https://www.reuters.com','https://www.neuters.de');
-articleLink=articleLink.replace('http://www.reuters.com','http://www.neuters.de');
-articleLink=articleLink.replace('https://reuters.com','https://neuters.de');
-articleLink=articleLink.replace('http://reuters.com','http://neuters.de');
-if (articleLink.includes('https://www.ft.com') || articleLink.includes('http://ft.com') || articleLink.includes('https://www.ft.com') || articleLink.includes('http://www.ft.com'))
-{
-//strip params from url
-articleLink=articleLink.split("?")[0];
-}
+articleLink=articleLink.replace('https://www.x.com','https://www.xcancel.com');
+articleLink=articleLink.replace('http://www.x.com','http://www.xcancel.com');
+articleLink=articleLink.replace('https://x.com','https://xcancel.com');
+articleLink=articleLink.replace('http://x.com','http://xcancel.com');
+articleLink=articleLink.replace('https://www.bloomberg.com','https://archive.ph/https://www.bloomberg.com');
+articleLink=articleLink.replace('http://www.bloomberg.com','https://archive.ph/http://www.bloomberg.com');
+articleLink=articleLink.replace('https://bloomberg.com','https://archive.ph/https://bloomberg.com');
+articleLink=articleLink.replace('http://bloomberg.com','https://archive.ph/http://bloomberg.com');
+articleLink=articleLink.replace('https://www.reuters.com','http://127.0.0.1:8085');
+articleLink=articleLink.replace('http://www.reuters.com','http://127.0.0.1:8085');
+articleLink=articleLink.replace('https://reuters.com','http://127.0.0.1:8085');
+articleLink=articleLink.replace('http://reuters.com','http://127.0.0.1:8085');
 articleLink=articleLink.replace('https://www.ft.com','https://archive.ph/https://www.ft.com');
 articleLink=articleLink.replace('http://www.ft.com','https://archive.ph/http://www.ft.com');
 articleLink=articleLink.replace('https://ft.com','https://archive.ph/https://ft.com');
 articleLink=articleLink.replace('http://ft.com','https://archive.ph/http://ft.com');
-articleLink=articleLink.replace('http://x.com','https://xcancel.com');
-articleLink=articleLink.replace('https://x.com','https://xcancel.com');
+
+//strip the nonsense trail from the URL if getting an archive
+if (articleLink.includes("https://archive.ph"))
+{
+articleLink=articleLink.split("?")[0];
+}
 
 			var thetitle=xmlDoc.getElementsByTagName("entry")[index].getElementsByTagName("title")[0].childNodes[0].nodeValue;
 			var pass=true;
@@ -239,13 +240,7 @@ articleLink=articleLink.replace('https://x.com','https://xcancel.com');
 		theHTML = theHTML + "<a href=\"" + articleLink + "\" style=\"color:green\" \">" + xmlDoc.getElementsByTagName("entry")[index].getElementsByTagName("title")[0].childNodes[0].nodeValue + "</a>";
 
 		commentLink=xmlDoc.getElementsByTagName("entry")[index].querySelector("link").getAttribute("href").replace('www.reddit.com/r/',redditprox);
-		commentLink=commentLink.replace('www.' + redditprox,redditprox);
-
-		if (redditprox == "127.0.0.1:8084/r/" && commentLink.includes(redditprox))
-		{
-			commentLink=commentLink.replace('https:','http:');
-		}
-
+		commentLink=commentLink.replace('reddit.com/r/',redditprox);
 		theHTML = theHTML + "<br><a href=\"" + commentLink + "\" style=\"color:green\"\">Comments</a>" + "<br><br>";
 	}
 }

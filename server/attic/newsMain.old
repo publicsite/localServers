@@ -63,8 +63,6 @@ function eliminateRageBait(thetext){
 						return false;
 					else if (thetext.match("Farage") != null)
 						return false;
-					else if (thetext.match("FARAGE") != null)
-						return false;
 					else if (thetext.match("attack") != null)
 						return false;
 					else if (thetext.match("Attack") != null)
@@ -262,19 +260,19 @@ var newurl = '';
         if (self.xmlHttpReq.status == 200) {
     var xmlDoc = self.xmlHttpReq.responseXML;
 theHTML="<html><div style=\"background-color:black;\"><head><base target=\"_blank\"></head><center>"
-for(var index = 0; index < xmlDoc.getElementsByTagName("item").length; index++)
+for(var index = 0; index < xmlDoc.getElementsByTagName("entry").length; index++)
 {
-var articleLink = xmlDoc.getElementsByTagName("item")[index].querySelector("link").innerHTML;
-articleLink=articleLink.replace('https://youtu.be/','http://127.0.0.1:8082/https://youtu.be/');
-articleLink=articleLink.replace('https://www.youtu.be/','http://127.0.0.1:8082/https://www.youtu.be/');
-articleLink=articleLink.replace('https://youtube.com/','http://127.0.0.1:8082/https://youtube.com/');
-articleLink=articleLink.replace('https://www.youtube.com/','http://127.0.0.1:8082/https://www.youtube.com/');
-articleLink=articleLink.replace('reddit.com/r/',redditprox);
+var parser = new DOMParser;
+var dom = parser.parseFromString(
+    '<!doctype html><body>' + xmlDoc.getElementsByTagName("entry")[index].querySelector("content").innerHTML,
+    'text/html');
+var articleLink = dom.body.textContent.split("<span>")[1].match(new RegExp("href=\"" + "(.*)" + "\">"))[1];
 articleLink=articleLink.replace('https://www.reddit.com/r/','http://' + redditprox);
 articleLink=articleLink.replace('http://www.reddit.com/r/','http://' + redditprox);
 articleLink=articleLink.replace('https://reddit.com/r/','http://' + redditprox);
 articleLink=articleLink.replace('http://reddit.com/r/','http://' + redditprox);
 articleLink=articleLink.replace('www.reddit.com/r/',redditprox);
+articleLink=articleLink.replace('reddit.com/r/',redditprox);
 //awoo
 articleLink=articleLink.replace('https://www.thetimes.com','https://archive.ph/https://www.thetimes.com');
 articleLink=articleLink.replace('http://www.thetimes.com','https://archive.ph/http://www.thetimes.com');
@@ -297,12 +295,7 @@ articleLink=articleLink.replace('http://www.ft.com','https://archive.ph/http://w
 articleLink=articleLink.replace('https://ft.com','https://archive.ph/https://ft.com');
 articleLink=articleLink.replace('http://ft.com','https://archive.ph/http://ft.com');
 
-//strip the nonsense trail from the URL if getting an archive
-if (articleLink.includes("https://archive.ph"))
-{
-articleLink=articleLink.split("?")[0];
-}
-			var thetitle=xmlDoc.getElementsByTagName("item")[index].getElementsByTagName("title")[0].childNodes[0].nodeValue;
+			var thetitle=xmlDoc.getElementsByTagName("entry")[index].getElementsByTagName("title")[0].childNodes[0].nodeValue;
 			var pass=true;
 
 			if ( eliminateRageBait(thetitle) == false )
@@ -312,10 +305,9 @@ articleLink=articleLink.split("?")[0];
 	if (pass == true)
 	{
 
-		theHTML = theHTML + "<a href=\"" + articleLink + "\" style=\"color:green\" \">" + xmlDoc.getElementsByTagName("item")[index].getElementsByTagName("title")[0].childNodes[0].nodeValue + "</a>";
+		theHTML = theHTML + "<a href=\"" + articleLink + "\" style=\"color:green\" \">" + xmlDoc.getElementsByTagName("entry")[index].getElementsByTagName("title")[0].childNodes[0].nodeValue + "</a>";
 
-		commentLink="http://127.0.0.1:8084" + xmlDoc.getElementsByTagName("item")[index].querySelector("description").innerHTML.match(new RegExp("href=\'" + "(.*)" + "\'>"))[1]
-		commentLink=commentLink.replace('https://www.reddit.com/r/','http://' + redditprox).replace('http://www.reddit.com/r/','http://' + redditprox).replace('www.reddit.com/r/',redditprox).replace('reddit.com/r/',redditprox);
+		commentLink=xmlDoc.getElementsByTagName("entry")[index].querySelector("link").getAttribute("href").replace('https://www.reddit.com/r/','http://' + redditprox).replace('http://www.reddit.com/r/','http://' + redditprox).replace('www.reddit.com/r/',redditprox).replace('reddit.com/r/',redditprox);
 		theHTML = theHTML + "<br><a href=\"" + commentLink + "\" style=\"color:green\"\">Comments</a>" + "<br><br>";
 	}
 }

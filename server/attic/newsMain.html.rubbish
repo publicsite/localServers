@@ -63,8 +63,6 @@ function eliminateRageBait(thetext){
 						return false;
 					else if (thetext.match("Farage") != null)
 						return false;
-					else if (thetext.match("FARAGE") != null)
-						return false;
 					else if (thetext.match("attack") != null)
 						return false;
 					else if (thetext.match("Attack") != null)
@@ -103,6 +101,11 @@ function eliminateRageBait(thetext){
 						return false;
 					else if (thetext.match("Jew") != null)
 						pass=false;
+}
+
+
+function tempGet(strURL, tld) {
+window.open(strURL, "_blank");
 }
 
 function xmlhttpGet(strURL, tld) {
@@ -265,16 +268,12 @@ theHTML="<html><div style=\"background-color:black;\"><head><base target=\"_blan
 for(var index = 0; index < xmlDoc.getElementsByTagName("item").length; index++)
 {
 var articleLink = xmlDoc.getElementsByTagName("item")[index].querySelector("link").innerHTML;
-articleLink=articleLink.replace('https://youtu.be/','http://127.0.0.1:8082/https://youtu.be/');
-articleLink=articleLink.replace('https://www.youtu.be/','http://127.0.0.1:8082/https://www.youtu.be/');
-articleLink=articleLink.replace('https://youtube.com/','http://127.0.0.1:8082/https://youtube.com/');
-articleLink=articleLink.replace('https://www.youtube.com/','http://127.0.0.1:8082/https://www.youtube.com/');
-articleLink=articleLink.replace('reddit.com/r/',redditprox);
 articleLink=articleLink.replace('https://www.reddit.com/r/','http://' + redditprox);
 articleLink=articleLink.replace('http://www.reddit.com/r/','http://' + redditprox);
 articleLink=articleLink.replace('https://reddit.com/r/','http://' + redditprox);
 articleLink=articleLink.replace('http://reddit.com/r/','http://' + redditprox);
 articleLink=articleLink.replace('www.reddit.com/r/',redditprox);
+articleLink=articleLink.replace('reddit.com/r/',redditprox);
 //awoo
 articleLink=articleLink.replace('https://www.thetimes.com','https://archive.ph/https://www.thetimes.com');
 articleLink=articleLink.replace('http://www.thetimes.com','https://archive.ph/http://www.thetimes.com');
@@ -297,11 +296,6 @@ articleLink=articleLink.replace('http://www.ft.com','https://archive.ph/http://w
 articleLink=articleLink.replace('https://ft.com','https://archive.ph/https://ft.com');
 articleLink=articleLink.replace('http://ft.com','https://archive.ph/http://ft.com');
 
-//strip the nonsense trail from the URL if getting an archive
-if (articleLink.includes("https://archive.ph"))
-{
-articleLink=articleLink.split("?")[0];
-}
 			var thetitle=xmlDoc.getElementsByTagName("item")[index].getElementsByTagName("title")[0].childNodes[0].nodeValue;
 			var pass=true;
 
@@ -842,7 +836,10 @@ const subreddit = "ukpolitics";
 
 const hotornew = urlParams.get('t');
 
-redditRSSGet("http://127.0.0.1:8083/cgi-bin/reddit-ukpolitics-new-proxy.sh", "http://127.0.0.1:8083/cgi-bin/reddit-ukpolitics-new-proxy.sh");
+tempGet("http://127.0.0.1:8084/r/ukpolitics/new","http://127.0.0.1:8084/r/ukpolitics/new");
+
+//TO ADD BACK IN!!!
+//redditRSSGet("http://127.0.0.1:8083/cgi-bin/reddit-ukpolitics-new-proxy.sh", "http://127.0.0.1:8083/cgi-bin/reddit-ukpolitics-new-proxy.sh");
 
 }
 
