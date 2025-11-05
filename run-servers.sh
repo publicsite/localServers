@@ -1,5 +1,8 @@
 #!/bin/sh
 
+OLD_UMASK="$(umask)"
+umask 0022
+
 cd "$(dirname $0)"
 
 ####RUN interface###
@@ -93,3 +96,5 @@ cd ../../../
 
 #sudo -H -u searxng -i ${HOME}/webFrontends/startSearx.sh &
 #sleep 5
+
+umask "${OLD_UMASK}"
