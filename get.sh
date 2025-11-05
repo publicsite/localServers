@@ -1,5 +1,8 @@
 #!/bin/sh
 
+OLD_UMASK="$(umask)"
+umask 0022
+
 ####DEBIAN SCRIPT TO INSTALL ALTERNATE FRONTENDS####
 
 mkdir ~/webFrontends
@@ -140,3 +143,6 @@ cargo build
 #pip install -r requirements.txt
 
 #cd ..
+
+umask "${OLD_UMASK}"
+
