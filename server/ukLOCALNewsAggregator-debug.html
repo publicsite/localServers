@@ -1,0 +1,192 @@
+<html>
+<head>
+<meta http-equiv='cache-control' content='no-cache'>
+<meta http-equiv='expires' content='0'>
+<meta http-equiv='pragma' content='no-cache'>
+</head>
+<title>UK News Aggregator</title>
+</head>
+<center>
+<h2>All News:</h2>
+<body onload="aggregate();">
+<div id="theNews">Loading...</div>
+</body>
+</center>
+</html>
+<script src="https://cdn.jsdelivr.net/gh/abdmob/x2js/xml2json.js"></script>
+<script>
+	
+
+function getTime(dateString)
+{
+var date = new Date(dateString);
+return date.getTime();
+}
+
+function sortByDate(a, b) {
+    if (a[0] > b[0])
+	return 1;
+else return 0;
+}
+
+
+
+/*
+function reqonload() {
+        if (self.xmlHttpReq.status == 200) {
+		updatepage(self.xmlHttpReq.responseText, feed_name, index);
+		tryagain=0;
+        }
+	else if (self.xmlHttpReq.status == 405) {
+		tryagain=405;
+	}
+	else tryagain=0;
+}
+*/
+
+/*
+function xmlhttpPost(strURL, feed_name, index) {
+//var newurl = 'https://api.allorigins.win/json?url=';
+var newurl = 'https://test.cors.workers.dev/?';
+//var newurl = 'https://api.allorigins.win/raw?url=';
+    //var url = newurl + encodeURIComponent(strURL + '&' + 'nocache=' + Date.now());
+var url = newurl + strURL;
+	
+//here we use yahoo yql as a cors proxy
+var newurl = '';
+//"select title,link,pubDate from rss where url='"
+
+    var xmlHttpReq = false;
+    var self = this;
+    if (window.XMLHttpRequest) { // Mozilla/Safari
+        self.xmlHttpReq = new XMLHttpRequest();
+    }
+    else if (window.ActiveXObject) { // IE
+        self.xmlHttpReq = new ActiveXObject("Microsoft.XMLHTTP");
+    }
+
+    self.xmlHttpReq.open('GET', newurl + url, false);
+    self.xmlHttpReq.setRequestHeader('Content-Type', 'application/rss+xml');
+    self.xmlHttpReq.onload = reqonload();
+
+    self.xmlHttpReq.send();
+
+}
+*/
+
+
+async function fetchFunction(aURL) {
+
+	tryagain=1;
+
+	while (tryagain == 1)
+	{
+		const response = await fetch(aURL);
+
+		if (response.status == 200)
+		{
+			const responsetext = await response.text();
+			tryagain=0;
+			return responsetext;
+		}
+		else if (response.status == 405)
+		{
+			tryagain=1;
+		}
+		else
+		{
+			tryagain=0;
+			return "";
+		}
+	}
+}
+
+async function aggregate(){
+	
+var feed_urls = [
+"http://127.0.0.1:8083/cgi-bin/newsProxy9.sh",
+"http://127.0.0.1:8083/cgi-bin/newsProxy10.sh",
+"http://127.0.0.1:8083/cgi-bin/newsProxy11.sh",
+"http://127.0.0.1:8083/cgi-bin/newsProxy12.sh",
+]
+
+var feed_names = [
+"Met Office - East Of England",
+"Lynn News",
+"Scythe Association",
+"Wildscythe"
+]
+
+//Removed "The Daily Star","The Scotsman","Twitter","Trinity Mirror","Yahoo"
+//Removed "The Sun" "The Metro" "The Daily Mail" "HuffPost"
+
+	x2js = new X2JS();
+
+	entries = [];
+
+	for (index=0; index < feed_urls.length; ++index)
+	{
+			alert("Getting " + feed_names[index] + "...");
+
+		tryagain=1;
+		while (tryagain == 1)
+		{
+
+			strURL=feed_urls[index];
+			feed_name=feed_names[index];
+			//alert(entries.length)
+
+			//newurl = 'http://www.whateverorigin.org/get?url='
+			url = strURL;
+
+  			copiedstr = await fetchFunction(url);
+			str = copiedstr
+			//str = JSON.parse(copiedstr).contents.toString();
+			
+				myobj = x2js.xml_str2json(str);
+				//alert(myobj.rss.channel.item.length);
+
+				if (typeof myobj.rss.channel.item !== 'undefined')
+				{
+					if (typeof myobj.rss.channel.item.length !== 'undefined')
+					{
+						for (i=0; i < myobj.rss.channel.item.length; i++)
+						{
+
+						theEntry = '<a href="' + myobj.rss.channel.item[i].link + '">' + myobj.rss.channel.item[i].title + '</a>' + '<br>(' + feed_name + ": " + myobj.rss.channel.item[i].pubDate +')' + "<br><br>";
+
+							if (typeof myobj.rss.channel.item[i].title !== 'undefined')
+								thetitle=await myobj.rss.channel.item[i].title.toString();
+							else
+								thetitle=""
+
+							if (typeof myobj.rss.channel.item[i].description !== 'undefined')
+								thedescription=await myobj.rss.channel.item[i].description.toString();
+							else
+								thedescription=""
+
+							entries.push([getTime(myobj.rss.channel.item[i].pubDate), theEntry]);
+
+						}
+					}
+				}
+		}
+
+	}
+	
+	alert("Done getting feeds. Now Processing");
+
+entries.sort(function(a, b) {
+    return ((b[0] < a[0]) ? -1 : ((b[0] == a[0]) ? 0 : 1));
+});
+
+newsout = "";
+	for (index2=0; index2 < entries.length; ++ index2)
+	{
+		newsout = newsout + entries[index2][1];
+	}
+document.getElementById("theNews").innerHTML = "<center>" + newsout + "</center>";
+
+}
+
+</script>
