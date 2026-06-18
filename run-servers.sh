@@ -31,17 +31,17 @@ thepwd="$PWD"
 
 cd "${thepwd}/imgin"
 #runs on 127.0.0.1:8081
-./run.py &
+HTTP_PROXY="socks5://localhost:9050" http_proxy="socks5://localhost:9050" HTTPS_PROXY="socks5://localhost:9050" https_proxy="socks5://localhost:9050" ./run.py &
 sleep 5
 cd ..
 
 ####RUN YT-LOCAL####
 
-cd "${thepwd}/yt-local"
-#runs on 127.0.0.1:9010
-python3 server.py &
-sleep 5
-cd ..
+#cd "${thepwd}/yt-local"
+##runs on 127.0.0.1:9010
+#python3 server.py &
+#sleep 5
+#cd ..
 
 ####RUN QUETRE####
 
@@ -65,21 +65,23 @@ cd ../../../
 
 ####RUN REDLIB ####
 
-cd "${thepwd}/redlib-build/target/debug"
+cd "${thepwd}/redlib-build/target/release"
 
-#use a proxy to connect to redlib
-rand_num="$(expr $(od -A n -t d -N 1 /dev/urandom | tr -d ' ') % 3)"
-case $rand_num in
-0)
-HTTP_PROXY="http://190.242.157.215:8080" HTTPS_PROXY="http://190.242.157.215:8080" REDLIB_ENABLE_RSS=on ./redlib --address 127.0.0.1 --port 8084 &
-;;
-1)
-HTTP_PROXY="http://23.237.210.82:80" HTTPS_PROXY="http://23.237.210.82:80" REDLIB_ENABLE_RSS=on ./redlib --address 127.0.0.1 --port 8084 &
-;;
-2)
-HTTP_PROXY="http://159.69.57.20:8880" HTTPS_PROXY="http://159.69.57.20:8880" REDLIB_ENABLE_RSS=on ./redlib --address 127.0.0.1 --port 8084 &
-;;
-esac
+./redlib --address 127.0.0.1 --port 8084
+
+##use a proxy to connect to redlib
+#rand_num="$(expr $(od -A n -t d -N 1 /dev/urandom | tr -d ' ') % 3)"
+#case $rand_num in
+#0)
+#HTTP_PROXY="http://190.242.157.215:8080" HTTPS_PROXY="http://190.242.157.215:8080" REDLIB_ENABLE_RSS=on ./redlib --address 127.0.0.1 --port 8084 &
+#;;
+#1)
+#HTTP_PROXY="http://23.237.210.82:80" HTTPS_PROXY="http://23.237.210.82:80" REDLIB_ENABLE_RSS=on ./redlib --address 127.0.0.1 --port 8084 &
+#;;
+#2)
+#HTTP_PROXY="http://159.69.57.20:8880" HTTPS_PROXY="http://159.69.57.20:8880" REDLIB_ENABLE_RSS=on ./redlib --address 127.0.0.1 --port 8084 &
+#;;
+#esac
 
 sleep 5
 cd ../../../
