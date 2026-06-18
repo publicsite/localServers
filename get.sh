@@ -19,13 +19,22 @@ sudo apt-get update && sudo apt-get install -y git busybox
 
 #from https://github.com/mendel5/alternative-front-ends
 ###git clone https://github.com/zedeus/nitter
-git clone https://git.voidnet.tech/kev/imgin
-git clone https://git.sr.ht/~heckyel/yt-local
+https://github.com/EgosOwn/imgin
+####git clone https://git.voidnet.tech/kev/imgin #old url
+###git clone https://git.sr.ht/~heckyel/yt-local
 ###git clone https://github.com/pablouser1/ProxiTok
 git clone https://github.com/zyachel/quetre
 git clone https://github.com/HookedBehemoth/neuters
 ###git clone https://codeberg.org/SimpleWeb/SimplyTranslate-Web
-git clone https://github.com/redlib-org/redlib
+
+#redlib
+git clone --depth=1 https://github.com/redlib-org/redlib.git
+cd redlib
+git fetch origin pull/509/head:pr509
+git checkout pr509
+git merge pr509
+cd ..
+
 ###git clone https://github.com/benbusby/whoogle-search.git
 
 
@@ -54,7 +63,10 @@ python3 -m venv "${thepwd}/venv"
 
 ###### IMGIN ########
 
-sudo apt-get install -y python3-gevent python3-bottle
+sudo apt-get install -y python3-gevent python3-bottle tor
+
+#required because some draconian countries ban legitimate websites
+pip install pysocks
 
 cd "${thepwd}/imgin"
 
@@ -67,17 +79,19 @@ cd ..
 
 ###### YT-LOCAL ######
 
-sudo apt-get install -y python3-pip python3-full python3-flask python3-socks python3-stem python3-defusedxml python3-cachetools
+#### YT-LOCAL no longer works because youtube switched to javascript only for youtube website ####
 
-cd "${thepwd}/yt-local"
-rm settings.py
-rm server.py
-cp ../../settings.py .
-cp ../../server.py .
-pip install -r requirements.txt
-pip install cachetools
+##sudo apt-get install -y python3-pip python3-full python3-flask python3-socks python3-stem python3-defusedxml python3-cachetools
 
-cd ..
+#cd "${thepwd}/yt-local"
+#rm settings.py
+#rm server.py
+#cp ../../settings.py .
+#cp ../../server.py .
+#pip install -r requirements.txt
+#pip install cachetools
+
+#cd ..
 
 ####### PROXITOK #####
 
@@ -134,7 +148,10 @@ sudo apt-get install -y curl cargo
 cp -a redlib redlib-build
 cd redlib-build #i got up to here
 patch -p0 < "${thepwd}/../subreddit-rss.patch"
-cargo build
+cargo build --release
+cp -a ../redlib/.env.example target/release/.env
+sed -i "s/NSFW=off/NSFW=on/g" target/release/.env
+echo "REDLIB_ENABLE_RSS=on" >> target/release/.env
 
 ####### WHOOGLE SEARCH #####
 
