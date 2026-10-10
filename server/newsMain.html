@@ -495,6 +495,22 @@ function eliminateRageBait(thetext){
 						pass=false;
 					else if (thetext.match("Jimmy Savile") != null)
 						pass=false;
+					else if (thetext.match("rise of the far right") != null)
+						pass=false;
+					else if (thetext.match("rise of the far-right") != null)
+						pass=false;
+					else if (thetext.match("Rise of the Far Right") != null)
+						pass=false;
+					else if (thetext.match("Rise of the Far-Right") != null)
+						pass=false;
+					else if (thetext.match("anti-migrant") != null)
+						pass=false;
+					else if (thetext.match("Anti-migrant") != null)
+						pass=false;
+					else if (thetext.match("Anti-Migrant") != null)
+						pass=false;
+					else if (thetext.match("Patriot Platform") != null)
+						pass=false;
 }
 
 function xmlhttpGet(strURL, tld) {
@@ -672,10 +688,10 @@ articleLink=articleLink.replace('https://www.thetimes.com','https://archive.ph/h
 articleLink=articleLink.replace('http://www.thetimes.com','https://archive.ph/http://www.thetimes.com');
 articleLink=articleLink.replace('https://thetimes.com','https://archive.ph/https://thetimes.com');
 articleLink=articleLink.replace('http://thetimes.com','https://archive.ph/http://thetimes.com');
-articleLink=articleLink.replace('https://www.x.com','https://www.xcancel.com');
-articleLink=articleLink.replace('http://www.x.com','http://www.xcancel.com');
-articleLink=articleLink.replace('https://x.com','https://xcancel.com');
-articleLink=articleLink.replace('http://x.com','http://xcancel.com');
+articleLink=articleLink.replace('https://www.x.com','https://nitter.tiekoetter.com');
+articleLink=articleLink.replace('http://www.x.com','http://nitter.tiekoetter.com');
+articleLink=articleLink.replace('https://x.com','https://nitter.tiekoetter.com');
+articleLink=articleLink.replace('http://x.com','http://nitter.tiekoetter.com');
 articleLink=articleLink.replace('https://www.bloomberg.com','https://archive.ph/https://www.bloomberg.com');
 articleLink=articleLink.replace('http://www.bloomberg.com','https://archive.ph/http://www.bloomberg.com');
 articleLink=articleLink.replace('https://bloomberg.com','https://archive.ph/https://bloomberg.com');
@@ -1108,7 +1124,18 @@ var feed_names = [
 						pass=true;
 					else if (thedescription.match("recycling") != null)
 						pass=true;
-
+					else if (thedescription.match("diesel") != null)
+						pass=true;
+					else if (thedescription.match("Diesel") != null)
+						pass=true;
+					else if (thedescription.match("Petrol") != null)
+						pass=true;
+					else if (thedescription.match("Petrol") != null)
+						pass=true;
+					else if (thedescription.match("Crack Spread") != null)
+						pass=true;
+					else if (thedescription.match("Crack-Spread") != null)
+						pass=true;
 					
 
 					//check the title
@@ -1328,6 +1355,18 @@ var feed_names = [
 					else if (thetitle.match("recycling") != null)
 						pass=true;
 					else if (thetitle.match("Recycling") != null)
+						pass=true;
+					else if (thetitle.match("diesel") != null)
+						pass=true;
+					else if (thetitle.match("Diesel") != null)
+						pass=true;
+					else if (thetitle.match("Petrol") != null)
+						pass=true;
+					else if (thetitle.match("Petrol") != null)
+						pass=true;
+					else if (thetitle.match("Crack Spread") != null)
+						pass=true;
+					else if (thetitle.match("Crack-Spread") != null)
 						pass=true;
 
 					//eliminate rage bait - check the title
@@ -1794,6 +1833,22 @@ var feed_names = [
 					else if (thetitle.match("Taylor Swift") != null)
 						pass=false;
 					else if (thetitle.match("Jimmy Savile") != null)
+						pass=false;
+					else if (thetitle.match("rise of the far right") != null)
+						pass=false;
+					else if (thetitle.match("rise of the far-right") != null)
+						pass=false;
+					else if (thetitle.match("Rise of the Far Right") != null)
+						pass=false;
+					else if (thetitle.match("Rise of the Far-Right") != null)
+						pass=false;
+					else if (thetitle.match("anti-migrant") != null)
+						pass=false;
+					else if (thetitle.match("Anti-migrant") != null)
+						pass=false;
+					else if (thetitle.match("Anti-Migrant") != null)
+						pass=false;
+					else if (thetitle.match("Patriot Platform") != null)
 						pass=false;
 
 
